@@ -42,10 +42,18 @@ static vector<T> vector_of(ELFIO::section* sec) {
 }
 
 int create_map_crab(uint32_t map_type, uint32_t key_size, uint32_t value_size, uint32_t max_entries, ebpf_verifier_options_t options) {
+    //std::cout << "key size: " << key_size << "; value size: " << value_size;
     if (map_type == 12 || map_type == 13) {
+        //std::cout << "; bad!\n";
         return -1;
     }
-    return (value_size << 14) + (key_size << 6); // + i;
+    if (key_size > (1 << 8))
+        throw std::runtime_error("bad map key size " + std::to_string(key_size));
+    if (value_size > (1 << (31 - 8)))
+        throw std::runtime_error("bad map value size " + std::to_string(value_size));
+    int res = (value_size << 8) + key_size; // + i;
+    //std::cout << "; fd: " << res << "\n";
+    return res;
 }
 
 static BpfProgType section_to_progtype(const std::string& section, const std::string& path) {

@@ -57,7 +57,7 @@ inline linear_constraint_t neq(variable_t a, variable_t b) {
 
 constexpr int MAX_PACKET_OFF = 0xffff;
 constexpr int64_t MY_INT_MAX = INT_MAX;
-constexpr int64_t PTR_MAX = MY_INT_MAX - MAX_PACKET_OFF;
+constexpr int64_t PTR_MAX = MY_INT_MAX / 2 - MAX_PACKET_OFF;
 
 /** Linear constraint for a pointer comparison.
  */
@@ -490,10 +490,10 @@ class ebpf_domain_t final {
         using namespace dsl_syntax;
 
         auto fd_reg = reg_pack(s.map_fd_reg);
-        apply(m_inv, crab::bitwise_binop_t::LSHR, variable_t::map_value_size(), fd_reg.value, (number_t)14);
+        apply(m_inv, crab::bitwise_binop_t::LSHR, variable_t::map_value_size(), fd_reg.value, (number_t)8);
         variable_t mk = variable_t::map_key_size();
-        apply(m_inv, crab::arith_binop_t::UREM, mk, fd_reg.value, (number_t)(1 << 14));
-        lshr(mk, 6);
+        apply(m_inv, crab::arith_binop_t::UREM, mk, fd_reg.value, (number_t)(1 << 8));
+        // lshr(mk, 6);
 
         auto access_reg = reg_pack(s.access_reg);
 
